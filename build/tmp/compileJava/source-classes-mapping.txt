@@ -1,2 +1,6 @@
 chapter_01/test.java
  chapter_01.test
+chapter_01/iloveyouboss/Scoreable.java
+ chapter_01.iloveyouboss.Scoreable
+chapter_01/iloveyouboss/ScoreCollection.java
+ chapter_01.iloveyouboss.ScoreCollection
