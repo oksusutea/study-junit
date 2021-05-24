@@ -8,6 +8,13 @@
  ***/
 package chapter_07.scratch;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.everyItem;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.isA;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 
