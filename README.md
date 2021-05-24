@@ -326,3 +326,112 @@ Http의 `get()`메소드는 넘겨진 위도와 경도 값이 유효한지 검�
 * null을 반환하는가?
 
 추가로, 목은 단위 테스트 커버리지의 구멍(간극)을 만들기 때문에(운영과 다르고, 실제 기능은 아니기 때문에), 통합 테스트를 작성해 이 구멍을 막아야 한다.
+
+***
+
+# 테스트 리팩토링
+
+테스트는 결함을 최소화하고 리팩토링으로 프로덕션 시스템을 깔끔하게 유지시켜 주지만, 지속적인 비용을 의미하기도 한다.
+
+시스템이 변경됨에 따라 테스트 코드도 다시 들여다보아야 한다. 프로덕션 시스템을 리팩토링 하는 것처럼 테스트를 리팩토링하고, 이해도를 최대화하며 유지 보수 비용을 최소화 할 수
+있다.
+
+### 불필요한 테스트 코드
+
+#### 예외처리
+
+테스트 코드가 예외를 던진다면, try/catch 블록이 잡아 스택 트레이스를 분출할 것이다(SearchTest), 그 말은 테스트 메서드는 예외를 기대하지 않겟다는 것이다.
+
+테스트 코드가 예외를 기대하지 않는다면, 예외가 날아가게 두면 된다(throws를 통해). 예외가 발생한 테스트는 오류로 표시되고 출력창애 스택 트레이스를 볼 수 있다.
+
+이렇게 작업하게 되면 명시적인 try/catch 블럭은 가치가 없다.
+
+#### notnull
+
+어떤 변수를 역으로 참조할 경우, null이 아닌 것을 검사하는 것(not-null)은 군더더기이기 때문에 제거하는 것이 좋다.
+
+#### 추상화 누락
+
+잘 구성된 테스트는 시스템과 상호 작용을 :
+
+* 데이터 준비하기
+* 시스템과 동작하기
+* 결과 단언하기
+
+이 세가지 관점에서 보여준다.
+
+좋은 테스트는 이렇게 클라이언트가 시스템과 어떻게 상호작용하는지 추상화하여 보여준다.
+
+해당 챕터에서는 하나의 개념을 구체화 하는 단언문 5줄을 포괄하는 사용자 정의 매처로 리팩토링 하였다.
+
+* 매처를 사용자 정의로 구현하려면 더 많은 행의 코드가 필요하나, 테스트를 이해하는 노력이 단순화되어 충분히 가지차 있다.
+* 단일 개념을 구현하는 2줄 혹은 3줄이 넘는 코드를 발견했다면 깔끔한 문장 1줄로 추출이 가능한지 고민해보자.
+
+### 부적절한 정보
+
+잘 추상화된 테스트 코드는 코드를 이해하는데 중요한 것을 부각시키며, 그렇지 않은 것은 보이지 않게 해준다.  
+테스트는 그 의미가 불분명한 매직 티러럴(매직 넘버)등을 포함하고 있다.
+
+* 상수로 선언하지 앙ㄴㅎ은 숫자 리터럴을 **매직 넘버**라고 하며, 코드에는 되도록 사용하지 않는 것이 좋다.
+
+#### 부푼 생성
+
+객체를 생성하는 도우미 메서드를 작성하여 호출하자. 이렇게 되면 정신산만한 세부 사항을 숨기고 훨씬 이해하기 쉬워진다.
+
+BEFORE :
+
+```java
+@Test
+public void testSearch()throws IOException{
+    String pageContent="There are certain queer times and occasions "
+    +"in this strange mixed affair we call life when a man "
+    +"takes this whole universe for a vast practical joke, "
+    +"though the wit thereof he but dimly discerns, and more "
+    +"than suspects that the joke is at nobody's expense but "
+    +"his own.";
+    byte[]bytes=pageContent.getBytes();
+    ByteArrayInputStream stream=new ByteArrayInputStream(bytes);
+    ....
+```
+
+AFTER :
+
+```java
+public void testSearch()throws IOException{
+    InputStream stream=
+    streamOn("There are certain queer times and occasions "
+    +"in this strange mixed affair we call life when a man "
+    +"takes this whole universe for a vast practical joke, "
+    +"though the wit thereof he but dimly discerns, and more "
+    +"than suspects that the joke is at nobody's expense but "
+    +"his own.");
+    ....
+    }
+private InputStream streamOn(String pageContent){
+    return new ByteArrayInputStream(pageContent.getBytes());
+    }
+```
+
+### 다수의 단언
+
+테스트마다 한 개의 단언을 사용하는 것이 좋다.(테스트마다 단언 한 개를 사용하면 테스트명을 짓는데 수월하다) 물론, 단일 테스트에 다수의 사후 조건이 필요할 수 있지만, 그보다
+더 자주 여러 개의 단언이 있다는 것은 하나의 테스트 케이스를 두 개 이상 포함하고 있다는 증거이다.  
+테스트를 분리해 좀 더 테스트 맥락에 맞도록 기대하는 행동을 기술하도록 수정하자.
+
+### 테스트와 무관한 세부 사항들
+
+테스트에 사용되는 군더더기(로그 끄기, 스트림 닫기 등)는 `@Before`, `@After`등 메소드로 이동시키자.
+
+### 테스트 코드의 구성
+
+테스트에서 어느 부분들이 준비(Arrange), 실행(Act), 단언(Assert) 부분인지 아는 것은 테스트를 빠르게 인지할 수 있게 한다.
+
+AAA를 활용해 의도를 분명하게 하고, 해당 부분에 빈 줄을 삽입해주자.
+
+### 암시적 의미
+
+각각의 테스트는 **왜 그러한 결과를 기대하는 가?** 에 대해 분명하게 대답해야 한다.
+
+개발자는 테스트 준비와 단언 부분을 상호 연관지을 수 있어야 한다. 테스트 데이터는 명시적으로 바꾸어 이해하기 쉽게 만들자.
+
+* 상호 관련성을 향상시키는 방법 : 의미 있는 상수, 더 좋은 변수 이름, 더 좋은 데이터와 테스트에서 계산을 적게 만드는 것
