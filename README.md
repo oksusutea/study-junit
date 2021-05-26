@@ -62,11 +62,11 @@ DB등 영속성 저장소와 연관되어 있는 코드는 테스트 할 떄 수
 
 ```java
 public void add(Scoreable scoreable){
-        if(scoreable==null){
-        throw new IllegalArgumentException();
-        }
-        scores.add(scoreable);
-        }
+    if(scoreable==null){
+    throw new IllegalArgumentException();
+    }
+    scores.add(scoreable);
+    }
 ```
 
 이런 경계 조건에서는 **CORRECT** 약어를 기억해 적절하게 처리해주자.
@@ -206,22 +206,22 @@ command + N키를 이용해 변수를 리팩토링할 수 있다.
 ### SOLID 클래스의 설계 원칙
 
 * [S]RP : 단일 책임 원칙
-  * 클래스는 변경할 때 한가지 이유만 있어야 한다.
-  * 클래스는 작고 단일 목적을 추구한다.
+    * 클래스는 변경할 때 한가지 이유만 있어야 한다.
+    * 클래스는 작고 단일 목적을 추구한다.
 * [O]CP : 개방 폐쇄 원칙
-  * 클래스는 확장에 열려있고 변경에는 닫혀 있어야 한다.
-  * 기존 클래스의 변경을 최소화해야 한다.
+    * 클래스는 확장에 열려있고 변경에는 닫혀 있어야 한다.
+    * 기존 클래스의 변경을 최소화해야 한다.
 * [L]SP : 리스코프 치환 원칙
-  * 하위 타입은 반드시 상위 타입을 대체할 수 있어야 한다.
-  * 클라이언트 입장에서 오버라이딩한 메서드가 기능성을 깨면 안된다.
+    * 하위 타입은 반드시 상위 타입을 대체할 수 있어야 한다.
+    * 클라이언트 입장에서 오버라이딩한 메서드가 기능성을 깨면 안된다.
 * [I]SP : 인터페이스 분리 원칙
-  * 클라이언트는 필요하지 않는 메서드에 의존하면 안된다.
-  * 커다란 인터페이스를 다수의 작은 인터페이스로 분할해야 한다.
+    * 클라이언트는 필요하지 않는 메서드에 의존하면 안된다.
+    * 커다란 인터페이스를 다수의 작은 인터페이스로 분할해야 한다.
 * [D]IP : 의존성 역전 원칙
-  * 고수준 모듈은 저수준 모듈을 의존해서는 안된다.
-  * 둘 다 추상 클래스에 의존해야 한다.
-  * 추상 클래스는 구체 클래스에 의존해서는 안된다.
-  * 구체 클래스는 추상 클래스에 의존해야 한다.
+    * 고수준 모듈은 저수준 모듈을 의존해서는 안된다.
+    * 둘 다 추상 클래스에 의존해야 한다.
+    * 추상 클래스는 구체 클래스에 의존해서는 안된다.
+    * 구체 클래스는 추상 클래스에 의존해야 한다.
 
 ### SRP를 적용하는 클래스로 리팩토링
 
@@ -266,8 +266,8 @@ Public으로 옮기는 것이 좋다. 하지만 메소드가 새로운 클래스
 테스트 예제의 `HttpImpl`클래스는 아파치의 `HttpComponents`클라이언트와 상호 작용해 REST 호출을 실행한다.
 
 * 테스트하고자 하는 메소드가 HTTP 호출을 함으로써 생기는 문제점 :
-  * 실제 호출에 대한 테스트는 나머지 대다수의 빠른 테스트들에 비해 속도가 느리다.
-  * Nominatim HTTP API가 항상 가용한지 보장할 수 없다.
+    * 실제 호출에 대한 테스트는 나머지 대다수의 빠른 테스트들에 비해 속도가 느리다.
+    * Nominatim HTTP API가 항상 가용한지 보장할 수 없다.
 
 의존성이 있는 다른 코드와 분리하여 해당 메서드의 로직에 관한 단위 테스트를 진행해야 한다. HTTP 호출이 원활하다는 가정 하에 아래 두가지로 나누어 테스트 :
 
@@ -383,33 +383,33 @@ BEFORE :
 ```java
 @Test
 public void testSearch()throws IOException{
-        String pageContent="There are certain queer times and occasions "
-        +"in this strange mixed affair we call life when a man "
-        +"takes this whole universe for a vast practical joke, "
-        +"though the wit thereof he but dimly discerns, and more "
-        +"than suspects that the joke is at nobody's expense but "
-        +"his own.";
-        byte[]bytes=pageContent.getBytes();
-        ByteArrayInputStream stream=new ByteArrayInputStream(bytes);
-        ....
+    String pageContent="There are certain queer times and occasions "
+    +"in this strange mixed affair we call life when a man "
+    +"takes this whole universe for a vast practical joke, "
+    +"though the wit thereof he but dimly discerns, and more "
+    +"than suspects that the joke is at nobody's expense but "
+    +"his own.";
+    byte[]bytes=pageContent.getBytes();
+    ByteArrayInputStream stream=new ByteArrayInputStream(bytes);
+    ....
 ```
 
 AFTER :
 
 ```java
 public void testSearch()throws IOException{
-        InputStream stream=
-        streamOn("There are certain queer times and occasions "
-        +"in this strange mixed affair we call life when a man "
-        +"takes this whole universe for a vast practical joke, "
-        +"though the wit thereof he but dimly discerns, and more "
-        +"than suspects that the joke is at nobody's expense but "
-        +"his own.");
-        ....
-        }
+    InputStream stream=
+    streamOn("There are certain queer times and occasions "
+    +"in this strange mixed affair we call life when a man "
+    +"takes this whole universe for a vast practical joke, "
+    +"though the wit thereof he but dimly discerns, and more "
+    +"than suspects that the joke is at nobody's expense but "
+    +"his own.");
+    ....
+    }
 private InputStream streamOn(String pageContent){
-        return new ByteArrayInputStream(pageContent.getBytes());
-        }
+    return new ByteArrayInputStream(pageContent.getBytes());
+    }
 ```
 
 ### 다수의 단언
@@ -491,11 +491,11 @@ TDD의 사이클은 짧다. 테스트-코드-리팩토링의 각 사이클은 �
 #### 멀티스레드 코드 테스트 방법
 
 * 스레드 통제와 어플리케이션 코드 사이 중첩 최소화
-  * 스레드 없이 다량의 애플리케이션 코드를 단위 테스트 할 수 있도록 설계 변경
-  * 남은 작은 코드에 대해 스레드에 집중적인 테스트 작성
+    * 스레드 없이 다량의 애플리케이션 코드를 단위 테스트 할 수 있도록 설계 변경
+    * 남은 작은 코드에 대해 스레드에 집중적인 테스트 작성
 * 다른 사람의 작업을 믿을 것
-  * 자바 5에는 훌륭한 동시성 유틸리티 클래스(java.util.concurrent)가 있다.
-  * 예를 들어, 생산자/소비자 문제를 직접 코딩하지 말고 BlockingQueue 클래스를 사용하자.
+    * 자바 5에는 훌륭한 동시성 유틸리티 클래스(java.util.concurrent)가 있다.
+    * 예를 들어, 생산자/소비자 문제를 직접 코딩하지 말고 BlockingQueue 클래스를 사용하자.
 
 ### 데이터 베이스 테스트
 
@@ -520,3 +520,60 @@ TDD의 사이클은 짧다. 테스트-코드-리팩토링의 각 사이클은 �
 * 관심사를 분리하자.
 * 느리거나 휘발적인 코드를 목으로 대체해 단위 테스트의 의존성을 끊자.
 * 필요한 경우에는 통합 테스트를 작성하되, 단순하고 직접적으로 만들자.
+
+***
+
+# 프로젝트에서 테스트
+
+모든 개발 작업은 (대다수) 팀원들과 협업하며 개발을 진행할 것이다. 이 장에서는 팀원들과 깔끔하게 테스트를 정의할 수 있는 방법에 대해 알아본다.
+
+### 빠른 도입
+
+단위 테스트를 학습하며 배우는 것은 끊임없는 경계를 요구한다. 팀 동료는 테스트 코드보다 훨씬 빨리 코드를 만들 수도 있다. 처음부터 품질을 통제하며 개발하면 코드가 엉망이 되는
+것을 최소한으로 줄일 수 있다. 어떻게 하면 단위 테스트가 팀 문화의 습관적인 일부가 될 수 있을지 토론해보자.
+
+<br/>
+
+### 팀과 같은 편 되기
+
+팀원마다 테스트에 대한 접근 방식은 다르기 때문에 표준을 적용하는 것이 중요하다.
+
+* 단위 테스트 표준 만들기 :
+    * 코드를 체크인하기 전에 어떤 테스트를 실행해야 할지 여부
+    * 테스트 클래스와 메서드의 이름 짓는 방식
+    * 햄크레스트 혹은 전통적인 단언 사용 여부
+    * AAA 사용 여부
+    * 선호하는 목 도구 선택
+    * 체크인 테스트를 실행할 때 콘솔에 출력을 허용할지 여부
+    * 단위 테스트 스위트에서 느린 테스트를 분명하게 식별하고 막을 방법
+* 리뷰로 표준 준수 높이기 :
+    * 페이건 검사를 사용해 리뷰 절차를 공식화 할 수 있다.(뻔한 표준 위반 방지)
+    * 풀 리퀘스트 활용(GitHub)와 밀접하게 연관되어 있음
+    * 코드 리뷰 도구 활용(Upsource라는 인텔리제이 IDEA를 위한 코드 리뷰 도구 등)
+* 짝 프로그래밍을 이용한 리뷰 :
+    * 두 프로그래머가 나란히 앉아 소프트웨어를 개발하는 방식
+    * 사후 리뷰에는 몇가지 이슈가 있다 :
+        * 최상의 리뷰는 코드를 깊이 이해한 사람에게 나오지만 그럴 여유가 없음
+        * 가치가 있지만 노력만큼 높지 않음
+        * 심각한 문제를 고치기에는 너무 늦음
+
+### 지속적 통합으로 수렴
+
+지속적 통합(CI)서버라고 하는 도구의 지원을 받아 소스 저장소를 모니터링하자.  
+빌드에 문제가 있다면 CI 서버는 개발팀에게 통지하며, Hudson, Jenkins, TeamCity, AntHill, CruiseControl, Buildbot, Bamboo
+등이 있다.
+
+### 코드 커버리지
+
+코드 커버리지는 단위 테스트가 실행한 코드의 전체 퍼센트를 측정하는 것이다.  
+엠마(Emma), 코버투라(Cobertura)등 코드 커버리지 도구를 이용해 측정할 수 있다.
+
+* 엠마는 기본 블록(분기되지 않은 바이트 코드 덩어리)를 기준으로 하며, 코버투라는 코드의 줄 수로 측정한다.
+
+#### 커버리지는 어느 정도여야 하는가?
+
+코드를 작성하고 습관적으로 단위 테스트를 작성하는 사람들은 70%의 커버리지를 달성한다. 가급적 70%이상 커버하도록 노력해보자.
+
+그 외에도 커버되지 않은 영역을 보고, 커버되지 않은 부분이 염려된다면 더 많은 테스트를 작성할 것이다.  
+커버리지 밖의 코드는 보통 코드가 어렵거나 테스트 하기 까다롭기 때문이다. 하지만 코드 결함이 이러한 테스트되지 않은 코드에서 발생하니 꼼꼼히 확인해보자. 보통 TDD를 수행하는
+개발자는 90%이상 테스트를 한다. 하지만 꼭 커버리지가 높다고 무조건 좋은 것은 아니기에 숫자에 집착하지 말자.
